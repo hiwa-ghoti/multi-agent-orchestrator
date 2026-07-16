@@ -1,0 +1,34 @@
+---
+description: multi-agent-orchestrator の安全・設計ルール（常時適用）
+alwaysApply: true
+---
+
+# Orchestrator project rules
+
+## Secrets
+
+- Never commit `.env` or real `CURSOR_API_KEY` values.
+- Keep real keys only in `.env`. `.env.example` must stay a placeholder.
+- Do not print full API keys in logs, README, commits, or PR text.
+
+## Architecture
+
+- Parallelism = multiple `Agent.create` calls. Never concurrent `send` on one agent.
+- Default runtime is local; always pass `local: { cwd }` explicitly.
+- Always dispose agents (`finally` or `Symbol.asyncDispose`).
+- Loop mode must keep hard stops: max steps, max minutes, and Ctrl+C abort.
+- Distinguish startup errors (exit 1) from run failures (exit 2).
+
+## Scope
+
+- This repo is a portfolio Phase 1 scaffold: `once` / `parallel` / `loop` CLI.
+- Do not add auto-PR-to-existing-repos, Web UI, or cloud-first ops unless the user asks.
+- Do not design empty-repo spam; future "create repos" work must ship small complete demos.
+
+## Windows
+
+- Prefer `npm.cmd` in PowerShell when `npm.ps1` is blocked by execution policy.
+
+## Docs sync
+
+- When changing CLI flags or safety behavior, update `README.md`, `AGENTS.md`, and `SECURITY.md` if needed.
