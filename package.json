@@ -10,6 +10,7 @@
     "build": "tsc",
     "agent": "tsx src/index.ts",
     "ui": "tsx src/ui/server.ts",
+    "ui:open": "tsx src/ui/server.ts --open",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },

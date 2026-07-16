@@ -1,6 +1,7 @@
 import http from "node:http";
 import fs from "node:fs/promises";
 import path from "node:path";
+import { exec } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { loadConfig, getProjectRoot } from "../config.js";
 import {
@@ -17,6 +18,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC_DIR = path.resolve(__dirname, "../../public");
 const PORT = Number(process.env.UI_PORT || 3847);
 const HOST = "127.0.0.1";
+const SHOULD_OPEN_BROWSER =
+  process.env.UI_OPEN_BROWSER === "1" || process.argv.includes("--open");
+
+function openBrowser(url: string): void {
+  const cmd =
+    process.platform === "win32"
+      ? `start "" "${url}"`
+      : process.platform === "darwin"
+        ? `open "${url}"`
+        : `xdg-open "${url}"`;
+  exec(cmd, (err) => {
+    if (err) console.error(`ブラウザを開けませんでした: ${err.message}`);
+  });
+}
 
 type SseClient = {
   id: number;
@@ -282,4 +297,7 @@ server.listen(PORT, HOST, () => {
   console.log(`UI server listening on ${url}`);
   console.log("ブラウザで開いて once / parallel / loop を実行できます。");
   console.log("停止: Ctrl+C");
+  if (SHOULD_OPEN_BROWSER) {
+    openBrowser(url);
+  }
 });
