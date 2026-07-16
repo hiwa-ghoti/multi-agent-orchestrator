@@ -1,6 +1,6 @@
 import fs from "node:fs/promises";
 import path from "node:path";
-import type { AppConfig, LoopOptions, ParallelTasksFile, TaskItem, WorkerResult } from "./types.js";
+import type { AppConfig, LoopOptions, TaskItem, WorkerResult } from "./types.js";
 import {
   createLocalAgent,
   disposeAgent,
@@ -11,6 +11,7 @@ import {
 import { runParallel } from "./pool.js";
 import { runLoop } from "./loop.js";
 import { saveState } from "./state.js";
+import { parseTasksInput } from "./tasksText.js";
 
 export async function runOnce(
   config: AppConfig,
@@ -44,12 +45,12 @@ export async function runOnce(
 export async function loadTasksFile(filePath: string): Promise<TaskItem[]> {
   const absolute = path.resolve(filePath);
   const raw = await fs.readFile(absolute, "utf8");
-  const parsed = JSON.parse(raw) as ParallelTasksFile | TaskItem[];
-  if (Array.isArray(parsed)) return parsed;
-  if (parsed && Array.isArray(parsed.tasks)) return parsed.tasks;
-  throw new Error(
-    `タスクファイルの形式が不正です: ${absolute}\n{ "tasks": [ { "id": "...", "prompt": "..." } ] } を想定しています。`,
-  );
+  try {
+    return parseTasksInput(raw);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    throw new Error(`タスクファイルの形式が不正です: ${absolute}\n${message}`);
+  }
 }
 
 export async function orchestrateOnce(

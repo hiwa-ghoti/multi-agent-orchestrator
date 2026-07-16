@@ -43,13 +43,20 @@
 
             <div class="field hidden" data-show="parallel">
               <div class="field-head">
-                <label for="tasks-json">タスク JSON</label>
+                <label for="tasks-input">タスク（テキスト or JSON）</label>
                 <button id="load-sample" type="button" class="linkish">
                   サンプルを読み込む
                 </button>
               </div>
-              <textarea id="tasks-json" rows="12" spellcheck="false"></textarea>
-              <p class="hint">空のまま実行すると examples/tasks.sample.json を使います。</p>
+              <textarea
+                id="tasks-input"
+                rows="12"
+                spellcheck="false"
+                placeholder="- READMEの分かりにくい点を3つ挙げて。ファイルは変えないで&#10;- srcの構成をまとめて。ファイルは変えないで&#10;- ループの停止条件を確認して。ファイルは変えないで"
+              ></textarea>
+              <p class="hint">
+                1行 = 1タスク。先頭の <code>-</code> や番号は自動で消します。JSON を貼ってもOK。空ならサンプル JSON を使います。
+              </p>
             </div>
 
             <div class="row hidden" data-show="loop">

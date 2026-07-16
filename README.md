@@ -142,17 +142,33 @@ npm run agent -- once "このリポジトリの構成を短く説明して。フ
 
 ```bash
 npm run agent -- parallel examples/tasks.sample.json
+# テキストでも可（1行 = 1タスク）
+npm run agent -- parallel examples/tasks.sample.txt
 ```
 
-サンプル (`examples/tasks.sample.json`) は次の3タスクを同時に実行します。
+サンプルは次の3タスクを同時に実行します。
 
 | id | 内容 |
 |---|---|
-| `docs` | README の分かりにくい点を指摘（読み取り専用） |
-| `structure` | `src/` 各ファイルの役割を要約（読み取り専用） |
-| `safety` | ループ停止条件の場所を報告（読み取り専用） |
+| `docs` / `task-1` | README の分かりにくい点を指摘（読み取り専用） |
+| `structure` / `task-2` | `src/` 各ファイルの役割を要約（読み取り専用） |
+| `safety` / `task-3` | ループ停止条件の場所を報告（読み取り専用） |
 
-タスクファイルの形:
+#### テキスト入力（おすすめ）
+
+GUI の parallel タブ、または `.txt` ファイルでは **1行 = 1タスク** です。
+
+```text
+- READMEの分かりにくい点を3つ挙げて。ファイルは変えないで
+- srcの構成をまとめて。ファイルは変えないで
+- ループの停止条件を確認して。ファイルは変えないで
+```
+
+- 先頭の `-` / `*` / `・` や `1.` は自動で除去
+- 空行は無視
+- サーバー側で JSON の `tasks` 配列に変換してから実行
+
+#### JSON 入力（従来どおり）
 
 ```json
 {
@@ -249,7 +265,8 @@ npm run agent -- loop --resume --max-steps 2 "前回の続きをして"
 │   ├── agentRunner.ts    # Agent 作成・送信・ストリーム・破棄
 │   └── types.ts          # 型定義
 ├── examples/
-│   └── tasks.sample.json # 並列用サンプル（読み取り専用タスク）
+│   ├── tasks.sample.json # 並列用サンプル（JSON）
+│   └── tasks.sample.txt  # 並列用サンプル（テキスト・1行1タスク）
 ├── public/               # ローカル GUI（HTML/CSS/JS）
 ├── src/ui/
 │   └── server.ts         # GUI 用 localhost サーバー

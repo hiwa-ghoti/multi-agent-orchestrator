@@ -15,6 +15,7 @@
 # Windows PowerShell で npm.ps1 が弾かれる場合は npm.cmd を使う
 npm.cmd run agent -- once "<prompt>"
 npm.cmd run agent -- parallel examples/tasks.sample.json
+npm.cmd run agent -- parallel examples/tasks.sample.txt   # 1行=1タスクのテキスト可
 npm.cmd run agent -- loop --max-steps 3 --max-minutes 10 "<prompt>"
 npm.cmd run ui                 # http://127.0.0.1:3847 のローカル GUI
 npm.cmd run ui:open            # GUI 起動 + ブラウザ自動オープン
@@ -29,8 +30,9 @@ npm.cmd run build
 |---|---|
 | `src/` | CLI・オーケストレータ本体 |
 | `src/ui/` | ローカル GUI サーバー |
+| `src/tasksText.ts` | parallel 用テキスト/JSON → タスク配列変換 |
 | `public/` | GUI の静的ファイル |
-| `examples/` | 並列用サンプルタスク |
+| `examples/` | 並列用サンプルタスク（`.json` / `.txt`） |
 | `data/` | 実行時 state（コミットしない） |
 | `.env` | 秘密情報（コミット禁止） |
 | `.env.example` | 見本のみ（本物のキーを書かない） |

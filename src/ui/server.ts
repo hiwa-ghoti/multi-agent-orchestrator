@@ -12,6 +12,7 @@ import {
 import { runParallel } from "../pool.js";
 import { exitCodeForResults } from "../agentRunner.js";
 import { saveState } from "../state.js";
+import { parseTasksInput, tasksToPlainText } from "../tasksText.js";
 import type { TaskItem } from "../types.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -46,6 +47,8 @@ type RunBody = {
   resume?: boolean;
   tasksFile?: string;
   tasks?: TaskItem[];
+  /** Plain text (1 line = 1 task) or JSON. Preferred for the GUI. */
+  tasksText?: string;
 };
 
 let sseSeq = 0;
@@ -150,9 +153,19 @@ async function handleRun(body: RunBody): Promise<void> {
       if (!prompt) throw new Error("プロンプトを入力してください。");
       code = await orchestrateOnce(config, prompt, jobAbort.signal);
     } else if (body.mode === "parallel") {
-      if (body.tasks && body.tasks.length > 0) {
-        console.log(`[parallel] ${body.tasks.length} タスクを同時実行します`);
-        const results = await runParallel(config, body.tasks, jobAbort.signal);
+      let tasks: TaskItem[] | null = null;
+      if (body.tasksText?.trim()) {
+        tasks = parseTasksInput(body.tasksText);
+      } else if (body.tasks && body.tasks.length > 0) {
+        tasks = body.tasks;
+      }
+
+      if (tasks) {
+        console.log(`[parallel] ${tasks.length} タスクを同時実行します`);
+        for (const task of tasks) {
+          console.log(`  - ${task.id ?? "?"}: ${task.prompt.slice(0, 80)}`);
+        }
+        const results = await runParallel(config, tasks, jobAbort.signal);
         await saveState(config.statePath, {
           mode: "parallel",
           lastPrompt: "ui-inline-tasks",
@@ -225,15 +238,26 @@ function handleSse(req: http.IncomingMessage, res: http.ServerResponse): void {
   });
 }
 
-async function handleSampleTasks(res: http.ServerResponse): Promise<void> {
+async function handleSampleTasks(
+  req: http.IncomingMessage,
+  res: http.ServerResponse,
+): Promise<void> {
+  const url = new URL(req.url || "/", `http://${HOST}:${PORT}`);
   const samplePath = path.join(
     getProjectRoot(),
     "examples",
     "tasks.sample.json",
   );
   const raw = await fs.readFile(samplePath, "utf8");
-  res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
-  res.end(raw);
+  const format = url.searchParams.get("format") || "text";
+  if (format === "json") {
+    res.writeHead(200, { "Content-Type": "application/json; charset=utf-8" });
+    res.end(raw);
+    return;
+  }
+  const tasks = parseTasksInput(raw);
+  res.writeHead(200, { "Content-Type": "text/plain; charset=utf-8" });
+  res.end(tasksToPlainText(tasks));
 }
 
 const server = http.createServer(async (req, res) => {
@@ -246,7 +270,7 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === "GET" && url.pathname === "/api/sample-tasks") {
-      await handleSampleTasks(res);
+      await handleSampleTasks(req, res);
       return;
     }
 

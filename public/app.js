@@ -1,7 +1,7 @@
 const tabs = [...document.querySelectorAll(".tab")];
 const form = document.getElementById("run-form");
 const promptEl = document.getElementById("prompt");
-const tasksEl = document.getElementById("tasks-json");
+const tasksEl = document.getElementById("tasks-input");
 const maxStepsEl = document.getElementById("max-steps");
 const maxMinutesEl = document.getElementById("max-minutes");
 const resumeEl = document.getElementById("resume");
@@ -74,17 +74,7 @@ form.addEventListener("submit", async (event) => {
   if (mode === "parallel") {
     const raw = tasksEl.value.trim();
     if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        body.tasks = Array.isArray(parsed) ? parsed : parsed.tasks;
-        if (!Array.isArray(body.tasks)) {
-          appendLog("エラー: tasks 配列が見つかりません。\n");
-          return;
-        }
-      } catch (err) {
-        appendLog(`エラー: JSON が不正です (${err.message})\n`);
-        return;
-      }
+      body.tasksText = raw;
     }
   }
 
@@ -129,4 +119,9 @@ function connectEvents() {
 setMode("once");
 promptEl.value =
   "このリポジトリの構成を短く説明して。ファイルは変えないで。";
+tasksEl.value = [
+  "- READMEの分かりにくい点を3つ挙げて。ファイルは変えないで",
+  "- srcの構成をまとめて。ファイルは変えないで",
+  "- ループの停止条件を確認して。ファイルは変えないで",
+].join("\n");
 connectEvents();
