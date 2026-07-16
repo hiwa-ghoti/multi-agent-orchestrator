@@ -21,8 +21,9 @@ alwaysApply: true
 
 ## Scope
 
-- This repo is a portfolio Phase 1 scaffold: `once` / `parallel` / `loop` CLI.
-- Do not add auto-PR-to-existing-repos, Web UI, or cloud-first ops unless the user asks.
+- Core modes: `once` / `parallel` / `loop` CLI, plus localhost-only UI (`npm run ui`).
+- Do not add auto-PR-to-existing-repos or cloud-first ops unless the user asks.
+- Keep the UI bound to 127.0.0.1; never expose API keys to the browser.
 - Do not design empty-repo spam; future "create repos" work must ship small complete demos.
 
 ## Windows

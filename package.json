@@ -9,6 +9,7 @@
   "scripts": {
     "build": "tsc",
     "agent": "tsx src/index.ts",
+    "ui": "tsx src/ui/server.ts",
     "start": "node dist/index.js",
     "typecheck": "tsc --noEmit"
   },

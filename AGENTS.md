@@ -16,6 +16,7 @@
 npm.cmd run agent -- once "<prompt>"
 npm.cmd run agent -- parallel examples/tasks.sample.json
 npm.cmd run agent -- loop --max-steps 3 --max-minutes 10 "<prompt>"
+npm.cmd run ui                 # http://127.0.0.1:3847 のローカル GUI
 npm.cmd run typecheck
 npm.cmd run build
 ```
@@ -25,6 +26,8 @@ npm.cmd run build
 | パス | 役割 |
 |---|---|
 | `src/` | CLI・オーケストレータ本体 |
+| `src/ui/` | ローカル GUI サーバー |
+| `public/` | GUI の静的ファイル |
 | `examples/` | 並列用サンプルタスク |
 | `data/` | 実行時 state（コミットしない） |
 | `.env` | 秘密情報（コミット禁止） |
@@ -42,7 +45,7 @@ npm.cmd run build
 
 - `.env` や API キーをコミット・ログ・Issue・PR に出す
 - 既存のユーザーリポジトリへ自動 PR する機能を勝手に追加する（計画 Phase 3 までは「新リポ量産」も未実装のまま）
-- Web UI / クラウド本格運用をスコープ外で広げすぎる
+- クラウド本格運用や外部公開 Web を勝手に広げない（GUI は localhost 専用）
 - 空のゴミリポジトリを量産する設計
 
 ## 変更時のチェック
